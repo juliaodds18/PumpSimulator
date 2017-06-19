@@ -1,0 +1,9 @@
+\\burfell\users$\juliaod\documents\visual studio 2015\Projects\ForecourtSimulator_1\ForecourtSimulator_1\bin\Debug\ForecourtSimulator_1.exe
+\\burfell\users$\juliaod\documents\visual studio 2015\Projects\ForecourtSimulator_1\ForecourtSimulator_1\bin\Debug\ForecourtSimulator_1.pdb
+\\burfell\users$\juliaod\documents\visual studio 2015\Projects\ForecourtSimulator_1\ForecourtSimulator_1\obj\Debug\ForecourtSimulator_1.exe
+\\burfell\users$\juliaod\Documents\Visual Studio 2015\Projects\ForecourtSimulator_1\ForecourtSimulator_1\bin\Debug\ForecourtSimulator_1.exe.config
+\\burfell\users$\juliaod\Documents\Visual Studio 2015\Projects\ForecourtSimulator_1\ForecourtSimulator_1\obj\Debug\ForecourtSimulator_1.Form1.resources
+\\burfell\users$\juliaod\Documents\Visual Studio 2015\Projects\ForecourtSimulator_1\ForecourtSimulator_1\obj\Debug\ForecourtSimulator_1.Properties.Resources.resources
+\\burfell\users$\juliaod\Documents\Visual Studio 2015\Projects\ForecourtSimulator_1\ForecourtSimulator_1\obj\Debug\ForecourtSimulator_1.csproj.GenerateResource.Cache
+\\burfell\users$\juliaod\Documents\Visual Studio 2015\Projects\ForecourtSimulator_1\ForecourtSimulator_1\obj\Debug\ForecourtSimulator_1.csprojResolveAssemblyReference.cache
+\\burfell\users$\juliaod\Documents\Visual Studio 2015\Projects\ForecourtSimulator_1\ForecourtSimulator_1\obj\Debug\ForecourtSimulator_1.pdb
