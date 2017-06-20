@@ -588,6 +588,12 @@ namespace ForecourtSimulator_1
 
             status.Text = "Fuelling";
 
+            //Fetch the amount and volume lables, and reset them to 0.0 
+            Label volume = this.Controls.Find(baseVolumeNumberName + pumpID, true).FirstOrDefault() as Label;
+            volume.Text = baseAmount.ToString("N2");
+            Label amount = this.Controls.Find(baseAmountNumberName + pumpID, true).FirstOrDefault() as Label;
+            amount.Text = baseAmount.ToString("N2");
+
             ChangeImage(pumpID, imageFuelling);
         }
 
@@ -677,8 +683,7 @@ namespace ForecourtSimulator_1
             currentBox.Items.Add(toAdd);
 
             transactionID++;
-
-            //pumpThreads[pumpID - 1].Join();
+            lastChecked[pumpID - 1] = null; 
         }
 
         public void StatusLabelTextChanged(object sender, EventArgs e)
@@ -696,16 +701,9 @@ namespace ForecourtSimulator_1
             int pumpID = int.Parse(status.Name[status.Name.Length - 1].ToString());
             int index = pumpID - 1;
 
-
-            //Fetch the amount and volume lables, and reset them to 0.0 
-            Label volume = this.Controls.Find(baseVolumeNumberName + pumpID, true).FirstOrDefault() as Label;
-            volume.Text = baseAmount.ToString("N2");
-            Label amount = this.Controls.Find(baseAmountNumberName + pumpID, true).FirstOrDefault() as Label;
-            amount.Text = baseAmount.ToString("N2");
-
             //Reset signal arrays, so that the pump will run the simulation
-            threadStopSignals[pumpID - 1] = false;
-            threadPauseSignals[pumpID - 1] = false;
+            threadStopSignals[index] = false;
+            threadPauseSignals[index] = false;
 
             //Start thread  
             pumpThreads[index] = new Thread(() => AutomaticFuellingThread(pumpID)) { IsBackground = true };
