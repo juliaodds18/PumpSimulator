@@ -18,7 +18,7 @@ namespace ForecourtSimulator_1
         #region Member variables
 
         #region Settings
-        private int pumpFieldCount;
+        public int pumpFieldCount { get; set; }
         private int numberOfRows;
 
         private Size baseSize;
@@ -28,6 +28,8 @@ namespace ForecourtSimulator_1
 
         private double baseAmount = 0.00;
         private int transactionID = 1;
+
+        public static Form1 form;
 
         //Last grade-button checked
         private List<CheckBox> lastChecked = new List<CheckBox>();
@@ -90,7 +92,8 @@ namespace ForecourtSimulator_1
             baseLocation = new Point(13, 60);
             baseGradeButtonSize = new Size(30, 23);
             baseNozzleHandleButtonSize = new Size(75, 25);
-            Graphics graph = Graphics.FromImage(imageAuthorized);
+
+            form = this; 
 
             //Set grades 
             grades.Add(new Grade(1, "95 okt", 1.5));  //95 okt, price = 1, can be changed
@@ -752,7 +755,6 @@ namespace ForecourtSimulator_1
 
             List<Transaction> transactions = new List<Transaction>();
 
-            int count = 1;
             Transaction trans = new Transaction()
             {
                 ID = transactionID,
@@ -793,5 +795,10 @@ namespace ForecourtSimulator_1
             return transactions;
         }
         #endregion
+
+        public int GetNumberOfPumps()
+        {
+            return pumpFieldCount; 
+        }
     }
 }
