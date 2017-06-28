@@ -29,7 +29,7 @@ namespace ForecourtSimulator_1
         private double baseAmount = 0.00;
         private int transactionID = 1;
 
-        public static Form1 form;
+        ForecourtCommunication fcCommunication;
 
         //Last grade-button checked
         private List<CheckBox> lastChecked = new List<CheckBox>();
@@ -82,6 +82,8 @@ namespace ForecourtSimulator_1
         #endregion
 
         #endregion
+
+
         public Form1()
         {
             InitializeComponent();
@@ -93,13 +95,19 @@ namespace ForecourtSimulator_1
             baseGradeButtonSize = new Size(30, 23);
             baseNozzleHandleButtonSize = new Size(75, 25);
 
-            form = this; 
-
+            
             //Set grades 
             grades.Add(new Grade(1, "95 okt", 1.5));  //95 okt, price = 1, can be changed
             grades.Add(new Grade(2, "98 okt", 2.0));
             grades.Add(new Grade(3, "Diesel", 1.0));
+
+            fcCommunication = new ForecourtCommunication(this); 
         }
+
+        //public void SetForecourtCommunication(ForecourtCommunication fcc)
+        //{
+        //    fcCommunication = fcc;
+        //}
 
         #region Adding pump field to UI 
         private void buttonAddPump_Click(object sender, System.EventArgs e)

@@ -19,8 +19,15 @@ namespace ForecourtSimulator_1
 
         private static ManualResetEvent ConnectedEvent = new ManualResetEvent(false);
 
+        Form1 form; 
+
+        public ForecourtCommunication(Form1 form)
+        {
+            this.form = form; 
+        }
+
  
-        public static void CreateClient()
+        public void CreateClient()
         {
             //Want to wait until Forecourt server has been created until Sim client tries to connect
             bool signalReceived = ConnectedEvent.WaitOne(600000);
@@ -36,8 +43,9 @@ namespace ForecourtSimulator_1
             clientReader = new StreamReader(client);
             clientWriter = new StreamWriter(client);
 
-            NumberOfPumps();
 
+            NumberOfPumps();
+            //EnableUI(); 
             //While true, get commands and send to forecourt? 
 
         }
@@ -54,7 +62,7 @@ namespace ForecourtSimulator_1
             return clientReader.ReadLine();
         }
 
-        public static void StartPipeServer()
+        public void StartPipeServer()
         {
             try
             {
@@ -92,14 +100,24 @@ namespace ForecourtSimulator_1
             }
         }
 
-        public static void NumberOfPumps()
+        public void NumberOfPumps()
         {
-            //Need to find a way to fetch data from Form1 without causing a null reference exception 
-            string numberOfPumps = "3"; 
+            string numberOfPumps = form.pumpFieldCount.ToString();
             SimToForecourtDTO dto = new SimToForecourtDTO
             {
                 MsgType = SimToForecourtMessageType.NumberOfPumps,
                 MsgData = numberOfPumps
+            };
+
+            SendMessage(dto);
+        }
+
+        public void PumpToFuelling(int pumpID)
+        {
+            SimToForecourtDTO dto = new SimToForecourtDTO
+            {
+                MsgType = SimToForecourtMessageType.PumpToFuelling,
+                MsgData = pumpID.ToString()
             };
 
             SendMessage(dto);
@@ -114,7 +132,8 @@ namespace ForecourtSimulator_1
         public enum SimToForecourtMessageType
         {
             //Need to update this, this is just so that the project will not yield errors
-            NumberOfPumps
+            NumberOfPumps, 
+            PumpToFuelling
         }
     }
 }
