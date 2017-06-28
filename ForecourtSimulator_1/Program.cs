@@ -26,13 +26,13 @@ namespace ForecourtSimulator_1
             //Initialize a form, copy it into a variable in ForecourtCommunication (to reference the form) and then run it
             Form1 form = new Form1(); 
 
-            //Create an instance of Forecourt Communication, start the Simulator server and create a thread to wait until the client connects to the Forecourt server
-            ForecourtCommunication fcc = new ForecourtCommunication(form);
-            fcc.StartPipeServer();
+            ////Create an instance of Forecourt Communication, start the Simulator server and create a thread to wait until the client connects to the Forecourt server
+            //ForecourtCommunication fcc = new ForecourtCommunication(form);
+            //fcc.StartPipeServer();
 
-            Thread FCThread = new Thread(() => fcc.CreateClient());
-            FCThread.IsBackground = true;
-            FCThread.Start();
+            //Thread FCThread = new Thread(() => fcc.CreateClient());
+            //FCThread.IsBackground = true;
+            //FCThread.Start();
 
             Application.Run(form);
         }

@@ -45,8 +45,6 @@ namespace ForecourtSimulator_1
 
 
             NumberOfPumps();
-            //EnableUI(); 
-            //While true, get commands and send to forecourt? 
 
         }
 
@@ -87,7 +85,7 @@ namespace ForecourtSimulator_1
                     {
                         string line = serverReader.ReadLine();
                         string response = "";
-                        //HandleForecourtMessages(line, ref response); 
+                        HandleForecourtMessages(line, ref response); 
 
                         serverWriter.WriteLine(response);
                         serverWriter.Flush();
@@ -100,6 +98,18 @@ namespace ForecourtSimulator_1
             }
         }
 
+        private void HandleForecourtMessages(string line, ref string response)
+        {
+            ForecourtToSimDTO message = Newtonsoft.Json.JsonConvert.DeserializeObject<ForecourtToSimDTO>(line);
+
+            switch (message.MsgType)
+            {
+                case ForecourtToSimMessageType.PumpToIdle:
+                    form.StatusAuthorizedToIdle(int.Parse(message.MsgData));
+                    break;
+            }
+        }
+
         public void NumberOfPumps()
         {
             string numberOfPumps = form.pumpFieldCount.ToString();
@@ -107,6 +117,17 @@ namespace ForecourtSimulator_1
             {
                 MsgType = SimToForecourtMessageType.NumberOfPumps,
                 MsgData = numberOfPumps
+            };
+
+            SendMessage(dto);
+        }
+
+        public void PumpToStarting(int pumpID)
+        {
+            SimToForecourtDTO dto = new SimToForecourtDTO
+            {
+                MsgType = SimToForecourtMessageType.PumpToStarting,
+                MsgData = pumpID.ToString()
             };
 
             SendMessage(dto);
@@ -123,6 +144,39 @@ namespace ForecourtSimulator_1
             SendMessage(dto);
         }
 
+        public void PumpToPaused(int pumpID)
+        {
+            SimToForecourtDTO dto = new SimToForecourtDTO
+            {
+                MsgType = SimToForecourtMessageType.PumpToPaused,
+                MsgData = pumpID.ToString()
+            };
+
+            SendMessage(dto);
+        }
+
+        public void PumpToAuthorized(int pumpID)
+        {
+            SimToForecourtDTO dto = new SimToForecourtDTO
+            {
+                MsgType = SimToForecourtMessageType.PumpToAuthorized,
+                MsgData = pumpID.ToString()
+            };
+
+            SendMessage(dto);
+        }
+
+        public void PumpToCalling(int pumpID)
+        {
+            SimToForecourtDTO dto = new SimToForecourtDTO
+            {
+                MsgType = SimToForecourtMessageType.PumpToCalling,
+                MsgData = pumpID.ToString()
+            };
+
+            SendMessage(dto);
+        }
+
         public class SimToForecourtDTO
         {
             public SimToForecourtMessageType MsgType;
@@ -133,7 +187,22 @@ namespace ForecourtSimulator_1
         {
             //Need to update this, this is just so that the project will not yield errors
             NumberOfPumps, 
-            PumpToFuelling
+            PumpToStarting,
+            PumpToFuelling,
+            PumpToPaused,
+            PumpToAuthorized,
+            PumpToCalling
+        }
+
+        public class ForecourtToSimDTO
+        {
+            public ForecourtToSimMessageType MsgType;
+            public string MsgData;
+        }
+
+        public enum ForecourtToSimMessageType
+        {
+            PumpToIdle
         }
     }
 }

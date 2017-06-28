@@ -101,13 +101,21 @@ namespace ForecourtSimulator_1
             grades.Add(new Grade(2, "98 okt", 2.0));
             grades.Add(new Grade(3, "Diesel", 1.0));
 
-            fcCommunication = new ForecourtCommunication(this); 
+            StartServerAndClient();
         }
 
-        //public void SetForecourtCommunication(ForecourtCommunication fcc)
-        //{
-        //    fcCommunication = fcc;
-        //}
+        public void StartServerAndClient()
+        {
+            //Create an instance of Forecourt Communication, start the Simulator server and create a thread to wait until the client connects to the Forecourt server
+            ForecourtCommunication fcc = new ForecourtCommunication(this);
+            fcCommunication = fcc;
+            fcc.StartPipeServer();
+
+            Thread FCThread = new Thread(() => fcc.CreateClient());
+            FCThread.IsBackground = true;
+            FCThread.Start();
+
+        }
 
         #region Adding pump field to UI 
         private void buttonAddPump_Click(object sender, System.EventArgs e)
@@ -578,18 +586,17 @@ namespace ForecourtSimulator_1
         #region Change Status of Pumps
         private void StatusIdleToCalling(int pumpID, Label status)
         {
-
             status.Text = "Calling";
+            fcCommunication.PumpToCalling(pumpID);
 
             ChangeImage(pumpID, imageCalling);
-
-
         }
 
-        private void StatusAuthorizedToStarting(int pumpId, Label status)
+        private void StatusAuthorizedToStarting(int pumpID, Label status)
         {
 
             status.Text = "Starting";
+            fcCommunication.PumpToStarting(pumpID);
 
             //No image for starting? 
         }
@@ -598,6 +605,8 @@ namespace ForecourtSimulator_1
         {
 
             status.Text = "Fuelling";
+
+            fcCommunication.PumpToFuelling(pumpID);
 
             //Fetch the amount and volume lables, and reset them to 0.0 
             Label volume = this.Controls.Find(baseVolumeNumberName + pumpID, true).FirstOrDefault() as Label;
@@ -612,6 +621,7 @@ namespace ForecourtSimulator_1
         {
 
             status.Text = "Authorized";
+            fcCommunication.PumpToAuthorized(pumpID);
 
             ChangeImage(pumpID, imageAuthorized);
         }
@@ -620,6 +630,7 @@ namespace ForecourtSimulator_1
         {
 
             status.Text = "Paused";
+            fcCommunication.PumpToPaused(pumpID);
 
             threadPauseSignals[pumpID - 1] = true;
 
@@ -630,16 +641,26 @@ namespace ForecourtSimulator_1
         {
 
             status.Text = "Fuelling";
+            fcCommunication.PumpToFuelling(pumpID);
 
             ChangeImage(pumpID, imageFuelling);
 
             int index = pumpID - 1;
         }
 
+        public void StatusAuthorizedToIdle(int pumpID)
+        {
+            Label status = this.Controls.Find(baseStatusName + pumpID, true).FirstOrDefault() as Label;
+            ThreadHelper.SetText(this, status, "Idle");
+
+            //Image idle missing?
+        }
+
         private void FuellingFinished(int pumpID, Label status)
         {
 
             status.Text = "Authorized";
+            fcCommunication.PumpToAuthorized(pumpID);
 
             threadStopSignals[pumpID - 1] = true; 
 
