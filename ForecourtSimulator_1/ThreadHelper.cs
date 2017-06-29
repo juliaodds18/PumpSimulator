@@ -10,6 +10,7 @@ namespace ForecourtSimulator_1
     public static class ThreadHelper
     {
         delegate void SetTextCallback(Form f, Control ctrl, string text);
+        delegate void SetButtonCallback(Form f, Control ctrl, bool value);
         /// <summary>
         /// Set text property of various controls
         /// </summary>
@@ -31,5 +32,22 @@ namespace ForecourtSimulator_1
                 ctrl.Text = text;
             }
         }
+
+        public static void SetButton(Form form, Control ctrl, bool value)
+        {
+            if(ctrl.InvokeRequired)
+            {
+                SetButtonCallback d = new SetButtonCallback(SetButton);
+                form.Invoke(d, new object[] { form, ctrl, value });
+            }
+            else
+            {
+                if (ctrl is Button)
+                {
+                    ((Button)ctrl).Enabled = value;
+                }
+            }
+        }
+
     }
 }

@@ -28,12 +28,18 @@ namespace ForecourtSimulator_1
 
         private double baseAmount = 0.00;
         private int transactionID = 1;
+        private bool emergencyStop = false;
+        int numberOfConcurrentTransactions = 2;
 
         ForecourtCommunication fcCommunication;
 
         //Last grade-button checked
         private List<CheckBox> lastChecked = new List<CheckBox>();
 
+        //How many transactions each pump has
+        private List<int> numberOfTransactions = new List<int>();
+
+        //List of grades
         private List<Grade> grades = new List<Grade>();
 
         //Thread objects, used for doing automatic simulation
@@ -95,7 +101,7 @@ namespace ForecourtSimulator_1
             baseGradeButtonSize = new Size(30, 23);
             baseNozzleHandleButtonSize = new Size(75, 25);
 
-            
+
             //Set grades 
             grades.Add(new Grade(1, "95 okt", 1.5));  //95 okt, price = 1, can be changed
             grades.Add(new Grade(2, "98 okt", 2.0));
@@ -152,6 +158,9 @@ namespace ForecourtSimulator_1
             threadLocks.Add(new object());
             threadPauseSignals.Add(false);
             threadStopSignals.Add(false);
+
+            //Add into the transaction-list
+            numberOfTransactions.Add(0);
 
             //Add controls inside of the panel 
 
@@ -519,6 +528,9 @@ namespace ForecourtSimulator_1
             Grade gradeOfButton = grades[gradeID - 1];
             if (priceNum != null)
                 priceNum.Text = gradeOfButton.price.ToString("N2");
+
+            //Every time that a button is pressed, send the grade to Forecourt Manager
+            fcCommunication.SetPumpGrade(pumpID - 1, gradeID - 1);
         }
 
         //Desc
@@ -617,7 +629,7 @@ namespace ForecourtSimulator_1
             ChangeImage(pumpID, imageFuelling);
         }
 
-        private void StatusStartingToAuthorized(int pumpID, Label status)
+        void StatusStartingToAuthorized(int pumpID, Label status)
         {
 
             status.Text = "Authorized";
@@ -656,13 +668,22 @@ namespace ForecourtSimulator_1
             //Image idle missing?
         }
 
+        public void StatusEmergencyStopToAuthorized(int pumpID)
+        {
+            Label status = this.Controls.Find(baseStatusName + pumpID, true).FirstOrDefault() as Label;
+            ThreadHelper.SetText(this, status, "Authorized");
+
+            ChangeImage(pumpID, imageAuthorized);
+
+        }
+
         private void FuellingFinished(int pumpID, Label status)
         {
 
             status.Text = "Authorized";
             fcCommunication.PumpToAuthorized(pumpID);
 
-            threadStopSignals[pumpID - 1] = true; 
+            threadStopSignals[pumpID - 1] = true;
 
             ChangeImage(pumpID, imageAuthorized);
 
@@ -673,7 +694,7 @@ namespace ForecourtSimulator_1
 
             nozzle.Checked = false;
             handle.Checked = false;
-            grade.Checked = false; 
+            grade.Checked = false;
 
             //Create Transaction
             CreateTransaction(pumpID);
@@ -715,7 +736,9 @@ namespace ForecourtSimulator_1
             currentBox.Items.Add(toAdd);
 
             transactionID++;
-            lastChecked[pumpID - 1] = null; 
+            lastChecked[pumpID - 1] = null;
+
+            numberOfTransactions[pumpID - 1]++;
         }
 
         public void StatusLabelTextChanged(object sender, EventArgs e)
@@ -733,6 +756,25 @@ namespace ForecourtSimulator_1
             int pumpID = int.Parse(status.Name[status.Name.Length - 1].ToString());
             int index = pumpID - 1;
 
+            //Do not allow the third transaction to start
+            if (numberOfTransactions[index] >= numberOfConcurrentTransactions)
+            {
+                status.Text = "Authorized";
+                fcCommunication.PumpToAuthorized(pumpID);
+
+                ChangeImage(pumpID, imageAuthorized);
+
+                //Reset the buttons
+                CheckBox nozzle = this.Controls.Find(baseButtonNozzleName + pumpID, true).FirstOrDefault() as CheckBox;
+                CheckBox handle = this.Controls.Find(baseButtonHandleName + pumpID, true).FirstOrDefault() as CheckBox;
+                CheckBox grade = lastChecked[pumpID - 1];
+
+                nozzle.Checked = false;
+                handle.Checked = false;
+                grade.Checked = false;
+                return;
+            }
+
             //Reset signal arrays, so that the pump will run the simulation
             threadStopSignals[index] = false;
             threadPauseSignals[index] = false;
@@ -749,12 +791,13 @@ namespace ForecourtSimulator_1
 
             Random random = new Random();
 
-            while (threadPauseSignals[index] == false && threadStopSignals[index] == false) {
+            while (threadPauseSignals[index] == false && threadStopSignals[index] == false && emergencyStop == false) {
                 lock (threadLocks[index]) {
 
                     //Set the text of the volume text field 
                     Label volume = this.Controls.Find(baseVolumeNumberName + pumpID, true).FirstOrDefault() as Label;
-                    string newVolume = (double.Parse(volume.Text) + (random.NextDouble()*(3 - 1) + 1)).ToString("N2");
+                    double newVolumeNum = double.Parse(volume.Text) + (random.NextDouble() * (3 - 1) + 1);
+                    string newVolume = newVolumeNum.ToString("N2");
                     ThreadHelper.SetText(this, volume, newVolume);
 
                     //Set the text of the amount text field, calculated using the grade price
@@ -762,13 +805,18 @@ namespace ForecourtSimulator_1
                     double priceOfUnit = double.Parse(price.Text);
 
                     Label amount = this.Controls.Find(baseAmountNumberName + pumpID, true).FirstOrDefault() as Label;
-                    string newAmount = (double.Parse(newVolume)*priceOfUnit).ToString("N2");
+                    double newAmountNum = double.Parse(newVolume) * priceOfUnit;
+                    string newAmount = newAmountNum.ToString("N2");
                     ThreadHelper.SetText(this, amount, newAmount);
 
+                    //Send this fuelling step to the Forecourt Manager
+                    fcCommunication.FuellingStep(pumpID, newVolumeNum, newAmountNum);
 
                     Thread.Sleep(700);
                 }
             }
+
+            fcCommunication.StopFuelling(pumpID);
 
             //Clean up after thread
             Thread toRemove = pumpThreads[index];
@@ -825,9 +873,67 @@ namespace ForecourtSimulator_1
         }
         #endregion
 
-        public int GetNumberOfPumps()
+        public string GetFuelPrices()
         {
-            return pumpFieldCount; 
+            string prices = "";
+
+            //Add all the grade prices to the back of 'prices', with an additional comma to seperate them
+            foreach (Grade g in grades)
+            {
+                prices += g.price.ToString() + ",";
+            }
+
+            //Remove the last comma
+            prices.TrimEnd(prices[prices.Length - 1]);
+
+            return prices;
+        }
+
+        public void SetEmergencyStop(bool value)
+        {
+            emergencyStop = value;
+
+            for (int i = 1; i <= pumpFieldCount; i++)
+            {
+                //Change the text to stopped
+                Label status = this.Controls.Find(baseStatusName + i.ToString(), true).FirstOrDefault() as Label;
+                ThreadHelper.SetText(this, status, "Stopped");
+
+                //Change the image to stopped
+                PictureBox imageToChange = this.Controls.Find(basePictureBoxIconName + i, true).FirstOrDefault() as PictureBox;
+                imageToChange.Image = imageStop;
+            }
+        }
+
+        public void ClosePump(int pumpID)
+        {
+            Label status = this.Controls.Find(baseStatusName + pumpID.ToString(), true).FirstOrDefault() as Label;
+            if (status.Text == "Authorized" || status.Text == "Idle")
+            {
+                ThreadHelper.SetText(this, status, "Closed");
+                PictureBox imageToChange = this.Controls.Find(basePictureBoxIconName + pumpID, true).FirstOrDefault() as PictureBox;
+                imageToChange.Image = imageClosed;
+            }
+        }
+
+        public void OpenPump(int pumpID)
+        {
+            Label status = this.Controls.Find(baseStatusName + pumpID.ToString(), true).FirstOrDefault() as Label;
+            if (status.Text == "Closed")
+            {
+                ThreadHelper.SetText(this, status, "Idle");
+                PictureBox imageToChange = this.Controls.Find(basePictureBoxIconName + pumpID, true).FirstOrDefault() as PictureBox;
+                imageToChange.Image = imageAuthorized;
+            }
+        }
+
+        public void DisableAddCloseButtons()
+        {
+            Button add = this.Controls.Find("buttonAddPump", true).FirstOrDefault() as Button;
+            Button remove = this.Controls.Find("buttonRemovePump", true).FirstOrDefault() as Button;
+
+            ThreadHelper.SetButton(this, add, false);
+            ThreadHelper.SetButton(this, remove, false);
         }
     }
 }

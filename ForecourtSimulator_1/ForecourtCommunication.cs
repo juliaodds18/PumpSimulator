@@ -45,6 +45,7 @@ namespace ForecourtSimulator_1
 
 
             NumberOfPumps();
+            SetFuelPrices();
 
         }
 
@@ -107,6 +108,21 @@ namespace ForecourtSimulator_1
                 case ForecourtToSimMessageType.PumpToIdle:
                     form.StatusAuthorizedToIdle(int.Parse(message.MsgData));
                     break;
+                case ForecourtToSimMessageType.EmergencyStop:
+                    form.SetEmergencyStop(true);
+                    break;
+                case ForecourtToSimMessageType.RecallEmergencyStop:
+                    form.StatusEmergencyStopToAuthorized(int.Parse(message.MsgData));
+                    break;
+                case ForecourtToSimMessageType.ClosePump:
+                    form.ClosePump(int.Parse(message.MsgData));
+                    break;
+                case ForecourtToSimMessageType.OpenPump:
+                    form.OpenPump(int.Parse(message.MsgData));
+                    break;
+                case ForecourtToSimMessageType.DisableAddRemoveButtons:
+                    form.DisableAddCloseButtons();
+                    break;
             }
         }
 
@@ -117,6 +133,18 @@ namespace ForecourtSimulator_1
             {
                 MsgType = SimToForecourtMessageType.NumberOfPumps,
                 MsgData = numberOfPumps
+            };
+
+            SendMessage(dto);
+        }
+
+        public void SetFuelPrices()
+        {
+            string prices = form.GetFuelPrices();
+            SimToForecourtDTO dto = new SimToForecourtDTO
+            {
+                MsgType = SimToForecourtMessageType.FuelPrices,
+                MsgData = prices
             };
 
             SendMessage(dto);
@@ -177,6 +205,39 @@ namespace ForecourtSimulator_1
             SendMessage(dto);
         }
 
+        public void SetPumpGrade(int pumpID, int gradeID)
+        {
+            SimToForecourtDTO dto = new SimToForecourtDTO
+            {
+                MsgType = SimToForecourtMessageType.SetPumpGrade,
+                MsgData = pumpID.ToString() + "," + gradeID.ToString()
+            };
+
+            SendMessage(dto);
+        }
+
+        public void FuellingStep(int pumpID, double volume, double amount)
+        {
+            SimToForecourtDTO dto = new SimToForecourtDTO
+            {
+                MsgType = SimToForecourtMessageType.FuellingStep,
+                MsgData = pumpID.ToString() + "," + volume.ToString() + "," + amount.ToString()
+            };
+
+            SendMessage(dto);
+        }
+
+        public void StopFuelling(int pumpID)
+        {
+            SimToForecourtDTO dto = new SimToForecourtDTO
+            {
+                MsgType = SimToForecourtMessageType.StopFuelling,
+                MsgData = pumpID.ToString()
+            };
+
+            SendMessage(dto);
+        }
+
         public class SimToForecourtDTO
         {
             public SimToForecourtMessageType MsgType;
@@ -191,7 +252,11 @@ namespace ForecourtSimulator_1
             PumpToFuelling,
             PumpToPaused,
             PumpToAuthorized,
-            PumpToCalling
+            PumpToCalling,
+            FuelPrices,
+            SetPumpGrade,
+            FuellingStep,
+            StopFuelling
         }
 
         public class ForecourtToSimDTO
@@ -202,7 +267,12 @@ namespace ForecourtSimulator_1
 
         public enum ForecourtToSimMessageType
         {
-            PumpToIdle
+            PumpToIdle,
+            EmergencyStop,
+            RecallEmergencyStop,
+            ClosePump,
+            OpenPump,
+            DisableAddRemoveButtons
         }
     }
 }
