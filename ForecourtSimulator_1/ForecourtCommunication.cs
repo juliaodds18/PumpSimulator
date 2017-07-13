@@ -93,7 +93,7 @@ namespace ForecourtSimulator_1
                     }
                 });
             }
-            catch (Exception e)
+            catch (IOException e)
             {
 
             }
@@ -101,28 +101,62 @@ namespace ForecourtSimulator_1
 
         private void HandleForecourtMessages(string line, ref string response)
         {
-            ForecourtToSimDTO message = Newtonsoft.Json.JsonConvert.DeserializeObject<ForecourtToSimDTO>(line);
-
-            switch (message.MsgType)
+            try
             {
-                case ForecourtToSimMessageType.PumpToIdle:
-                    form.StatusAuthorizedToIdle(int.Parse(message.MsgData));
-                    break;
-                case ForecourtToSimMessageType.EmergencyStop:
-                    form.SetEmergencyStop(true);
-                    break;
-                case ForecourtToSimMessageType.RecallEmergencyStop:
-                    form.StatusEmergencyStopToAuthorized(int.Parse(message.MsgData));
-                    break;
-                case ForecourtToSimMessageType.ClosePump:
-                    form.ClosePump(int.Parse(message.MsgData));
-                    break;
-                case ForecourtToSimMessageType.OpenPump:
-                    form.OpenPump(int.Parse(message.MsgData));
-                    break;
-                case ForecourtToSimMessageType.DisableAddRemoveButtons:
-                    form.DisableAddCloseButtons();
-                    break;
+                ForecourtToSimDTO message = Newtonsoft.Json.JsonConvert.DeserializeObject<ForecourtToSimDTO>(line);
+
+                switch (message.MsgType)
+                {
+                    case ForecourtToSimMessageType.PumpToIdle:
+                        form.StatusAuthorizedToIdle(int.Parse(message.MsgData));
+                        break;
+                    case ForecourtToSimMessageType.EmergencyStop:
+                        form.SetEmergencyStop(int.Parse(message.MsgData));
+                        break;
+                    case ForecourtToSimMessageType.RecallEmergencyStop:
+                        form.StatusEmergencyStopToAuthorized(message.MsgData);
+                        break;
+                    case ForecourtToSimMessageType.ClosePump:
+                        form.ClosePump(int.Parse(message.MsgData));
+                        break;
+                    case ForecourtToSimMessageType.OpenPump:
+                        form.OpenPump(int.Parse(message.MsgData));
+                        break;
+                    case ForecourtToSimMessageType.DisableAddRemoveButtons:
+                        form.DisableAddCloseButtons();
+                        break;
+                    case ForecourtToSimMessageType.PresetAmount:
+                        form.PresetAmount(message.MsgData);
+                        break;
+                    case ForecourtToSimMessageType.PresetVolume:
+                        form.PresetVolume(message.MsgData);
+                        break;
+                    case ForecourtToSimMessageType.StatusPumpToAuthorized:
+                        form.StatusPumpToAuthorized(int.Parse(message.MsgData));
+                        break;
+                    case ForecourtToSimMessageType.StatusPumpToStarting:
+                        form.StatusCallingToStarting(int.Parse(message.MsgData));
+                        break;
+                    case ForecourtToSimMessageType.Error:
+                        form.StatusPumpToError(int.Parse(message.MsgData));
+                        break;
+                    case ForecourtToSimMessageType.ErrorClear:
+                        form.StatusErrorToIdle(int.Parse(message.MsgData));
+                        break;
+                    case ForecourtToSimMessageType.PauseFuelling:
+                        form.PauseFuellingFromUI(int.Parse(message.MsgData));
+                        break;
+                    case ForecourtToSimMessageType.ResumeFuelling:
+                        form.ResumeFuellingFromUI(int.Parse(message.MsgData));
+                        break;
+                    case ForecourtToSimMessageType.AuthorizeCallingPump:
+                        form.StatusCallingToAuthorized(int.Parse(message.MsgData));
+                        break;
+                }
+            }
+            catch (ArgumentNullException e)
+            {
+
             }
         }
 
@@ -238,6 +272,28 @@ namespace ForecourtSimulator_1
             SendMessage(dto);
         }
 
+        public void RemovePosTransaction(int pumpID)
+        {
+            SimToForecourtDTO dto = new SimToForecourtDTO
+            {
+                MsgType = SimToForecourtMessageType.RemovePOSTransaction,
+                MsgData = pumpID.ToString()
+            };
+
+            SendMessage(dto);
+        }
+
+        public void PumpToIdle(int pumpID)
+        {
+            SimToForecourtDTO dto = new SimToForecourtDTO
+            {
+                MsgType = SimToForecourtMessageType.PumpToIdle,
+                MsgData = pumpID.ToString()
+            };
+
+            SendMessage(dto);
+        }
+
         public class SimToForecourtDTO
         {
             public SimToForecourtMessageType MsgType;
@@ -256,7 +312,9 @@ namespace ForecourtSimulator_1
             FuelPrices,
             SetPumpGrade,
             FuellingStep,
-            StopFuelling
+            StopFuelling,
+            RemovePOSTransaction,
+            PumpToIdle
         }
 
         public class ForecourtToSimDTO
@@ -272,7 +330,16 @@ namespace ForecourtSimulator_1
             RecallEmergencyStop,
             ClosePump,
             OpenPump,
-            DisableAddRemoveButtons
+            DisableAddRemoveButtons,
+            PresetAmount,
+            PresetVolume,
+            StatusPumpToAuthorized,
+            StatusPumpToStarting,
+            Error,
+            ErrorClear,
+            PauseFuelling,
+            ResumeFuelling,
+            AuthorizeCallingPump
         }
     }
 }

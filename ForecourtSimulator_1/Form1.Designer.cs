@@ -29,28 +29,44 @@
         private void InitializeComponent()
         {
             this.panel1 = new System.Windows.Forms.Panel();
+            this.pictureBox1 = new System.Windows.Forms.PictureBox();
             this.buttonRemovePump = new System.Windows.Forms.Button();
             this.buttonAddPump = new System.Windows.Forms.Button();
             this.labelHeader = new System.Windows.Forms.Label();
             this.panel1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.SuspendLayout();
             // 
             // panel1
             // 
-            this.panel1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(74)))), ((int)(((byte)(135)))));
+            this.panel1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(49)))), ((int)(((byte)(60)))), ((int)(((byte)(78)))));
+            this.panel1.Controls.Add(this.pictureBox1);
             this.panel1.Controls.Add(this.buttonRemovePump);
             this.panel1.Controls.Add(this.buttonAddPump);
             this.panel1.Controls.Add(this.labelHeader);
             this.panel1.Location = new System.Drawing.Point(12, 12);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(1433, 41);
+            this.panel1.Size = new System.Drawing.Size(1440, 41);
             this.panel1.TabIndex = 2;
+            // 
+            // pictureBox1
+            // 
+            this.pictureBox1.Image = global::ForecourtSimulator_1.Properties.Resources.LS_Fuel_App_icon;
+            this.pictureBox1.Location = new System.Drawing.Point(3, 0);
+            this.pictureBox1.Name = "pictureBox1";
+            this.pictureBox1.Size = new System.Drawing.Size(44, 41);
+            this.pictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
+            this.pictureBox1.TabIndex = 2;
+            this.pictureBox1.TabStop = false;
             // 
             // buttonRemovePump
             // 
-            this.buttonRemovePump.Location = new System.Drawing.Point(1310, 5);
+            this.buttonRemovePump.AutoSize = true;
+            this.buttonRemovePump.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.buttonRemovePump.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.buttonRemovePump.Location = new System.Drawing.Point(1301, 5);
             this.buttonRemovePump.Name = "buttonRemovePump";
-            this.buttonRemovePump.Size = new System.Drawing.Size(110, 32);
+            this.buttonRemovePump.Size = new System.Drawing.Size(119, 32);
             this.buttonRemovePump.TabIndex = 0;
             this.buttonRemovePump.Text = "Remove Pump";
             this.buttonRemovePump.UseVisualStyleBackColor = true;
@@ -58,10 +74,12 @@
             // 
             // buttonAddPump
             // 
-            this.buttonAddPump.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.buttonAddPump.Location = new System.Drawing.Point(1194, 5);
+            this.buttonAddPump.AutoSize = true;
+            this.buttonAddPump.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.buttonAddPump.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.buttonAddPump.Location = new System.Drawing.Point(1176, 5);
             this.buttonAddPump.Name = "buttonAddPump";
-            this.buttonAddPump.Size = new System.Drawing.Size(110, 32);
+            this.buttonAddPump.Size = new System.Drawing.Size(119, 32);
             this.buttonAddPump.TabIndex = 1;
             this.buttonAddPump.Text = "Add Pump";
             this.buttonAddPump.UseVisualStyleBackColor = true;
@@ -72,8 +90,8 @@
             this.labelHeader.Anchor = System.Windows.Forms.AnchorStyles.Left;
             this.labelHeader.AutoSize = true;
             this.labelHeader.Font = new System.Drawing.Font("Microsoft Sans Serif", 13.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.labelHeader.ForeColor = System.Drawing.Color.White;
-            this.labelHeader.Location = new System.Drawing.Point(3, 4);
+            this.labelHeader.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(252)))), ((int)(((byte)(186)))), ((int)(((byte)(88)))));
+            this.labelHeader.Location = new System.Drawing.Point(50, 3);
             this.labelHeader.Name = "labelHeader";
             this.labelHeader.Size = new System.Drawing.Size(184, 29);
             this.labelHeader.TabIndex = 0;
@@ -91,6 +109,7 @@
             this.Text = "Forecourt Pump Simulator";
             this.panel1.ResumeLayout(false);
             this.panel1.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -100,6 +119,7 @@
         private System.Windows.Forms.Button buttonAddPump;
         private System.Windows.Forms.Label labelHeader;
         private System.Windows.Forms.Button buttonRemovePump;
+        private System.Windows.Forms.PictureBox pictureBox1;
     }
 }
 

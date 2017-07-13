@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace ForecourtSimulator_1
 {
-    class Transaction
+    public class Transaction
     {
         public int ID { get; set; }
 
@@ -21,9 +21,7 @@ namespace ForecourtSimulator_1
 
         public int PumpID { get; set; }
 
-        public Transaction() {
-            
-        }
+        public Transaction() { }
 
         public Transaction(int Id, int gradeID, double amount, double price, double volume, int pumpID) {
             this.ID = Id;
